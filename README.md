@@ -27,7 +27,7 @@ As mentioned above, one of the biggest benifits of plex is that it allows you to
  
 Here is a simple example which tokenizes numbers and operators:
  
-```
+```python
 from plex.lexer import Lexer
 
 lexer = Lexer()
