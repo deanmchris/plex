@@ -1,6 +1,6 @@
 """Lighweight regex based lexer.
 
-This module provides a lighweight, easy to use regex based lexer. It can
+This module provides a lighweight, regex based lexer. It can
 be used for a varity of task and is very extensible.
 
 The entry point of the module is lexer.Lexer(), which creates a new lexer
@@ -13,20 +13,19 @@ tokens returned by the lexer are Token objects. Each token object has
 a value, a type, and a two-tuple position variable, representing the
 tokens line and column number.
 
-
-Whenever the  the lexer cannot match any rules specfied, a LexerError
+Whenever the lexer cannot match any rules specfied, a LexerError
 is raised.
 
 
 Here is a minmal example demonstrating the general structure of the
 module's parts.
 
-    from plex.lexer import Lexer, INTEGER_PAT
+    from plex.lexer import Lexer
 
     lexer = Lexer()
     lexer.setup('1 + 2')
 
-    @lexer.on_match(INTEGER_PAT)
+    @lexer.on_match('\d+')
     def INTEGER(self, token):
         return token
 
@@ -36,9 +35,6 @@ module's parts.
         
     for token in lexer:
         print(token)
-
-While LexerError and Token are both considered public, they should only
-be used to test the type of variables. They should not be called directly.
 """
 
 __author__ = 'Christian Dean <c1dea2n@gmail.com>'
@@ -48,7 +44,7 @@ __all__ = ['Lexer', 'LexerError', 'Token']
 import re
 
 
-WHITESPACE = """\s+"""
+WHITESPACE = "\s+"""
 LEXER_ERR_MSG = \
 """
 
@@ -109,30 +105,26 @@ class LexerError(Exception):
 class Lexer:
     """Lexer object.
 
-    The lexer has the following public methods:
+    Public Methods
+    --------------
 
-        setup:
+        setup : method
             Feed the lexer an input buffer.
 
-        get_pos:
+        get_pos : method
             The the current position of the lexer.
 
-        on_match:
+        on_match : method
             The decorator used for specifiy token regexes. Takes
             in a single pattern for matching a token, and the function
             itself for the action to be "done" when said token is found.
 
-            The decorated function should accept two arguments. self, which
-            is an instance of the Lexer class, and token, which is the token
-            that will be given back to the function if the regex is matched.
-
-        on_error:
+        on_error : method
             The decorator used to override the default error method of the
-            Lexer class. The decorated function should accept one argument
-            would be the character which could not be matched.
+            Lexer class.
 
-    The lexer as the following public attrbiutes. These can be used as
-    "hooks", to customize how the lexer deals with certian things:
+    Public Attributes
+    -----------------
 
         buffer : str
             The buffer of text the lexer will lex.
@@ -163,7 +155,7 @@ class Lexer:
             The stirng for the lexer to tokenize.
 
         ignore_ws : bool
-            This deterimes wheather or not the lexer skips whitespace.
+            This deterimes whether or not the lexer skips whitespace.
             The default is True.
         """
         self.buffer = buffer
@@ -244,7 +236,7 @@ class Lexer:
             token rule.
 
 
-        Usage(assuming you've already made an instance of Lexer):
+        Example usage(assuming you've already made an instance of Lexer):
 
             @lexer.on_match('\d+')
             def DIGITS(self, token):
@@ -272,13 +264,13 @@ class Lexer:
 
         Parameters
         ----------
-        func:
+        func : function
             The decorated error function. The function is allowed
             to do whatever is sees fit when an error is encountered,
             including skipping the character to ignore unreconized
             characters.
 
-        Usage(assuming you've already made an instance of Lexer):
+        Example usage(assuming you've already made an instance of Lexer):
 
             @lexer.on_error
             def error(self, value):
@@ -286,9 +278,7 @@ class Lexer:
 
         The decorated function should accept two arguments. The first is
         a lexer instance, the second is the value which caused the lexer
-        to err out.
-
-        Usage(assuming you've already made an instance of Lexer):
+        to raise an error.
         """
         self._error_func = func
         return func
